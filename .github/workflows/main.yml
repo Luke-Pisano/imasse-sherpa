@@ -1,0 +1,22 @@
+name: Build and Deploy
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron:  '0 1 * * 0'
+    
+jobs:
+  build_and_deploy:
+    name: Build and Deploy app
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: php classPull.php
+      - uses: EndBug/add-and-commit@v9 
+        with:
+          add: 'json'
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only --ha=false
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
